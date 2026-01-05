@@ -1,36 +1,125 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Bala's Digital Twin
 
-## Getting Started
+An AI-powered personal recruitment page featuring a conversational voice agent. Visitors can have a real-time voice conversation with a digital twin to learn about projects, skills, and experience.
 
-First, run the development server:
+![Next.js](https://img.shields.io/badge/Next.js-16-black?logo=next.js)
+![React](https://img.shields.io/badge/React-19-61DAFB?logo=react)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-4-38B2AC?logo=tailwind-css)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-3178C6?logo=typescript)
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+## ✨ Features
+
+- **Voice AI Agent** — Real-time conversational interface powered by ElevenLabs
+- **Audio Visualizer** — Dynamic orb that responds to speech with smooth animations
+- **Contact Form** — Validated form submissions stored in Supabase
+- **Modern UI** — Glass-morphism design with gradient backgrounds
+
+## 🛠 Tech Stack
+
+| Layer | Technology |
+|-------|------------|
+| Framework | [Next.js 16](https://nextjs.org) (App Router) |
+| Voice AI | [ElevenLabs Conversational AI](https://elevenlabs.io) |
+| Database | [Supabase](https://supabase.com) |
+| Styling | [Tailwind CSS 4](https://tailwindcss.com) |
+| Language | TypeScript |
+
+## 🚀 Getting Started
+
+### Prerequisites
+
+- Node.js 18+ 
+- npm, yarn, pnpm, or bun
+- ElevenLabs account with a configured AI agent
+- Supabase project with a `contact_submissions` table
+
+### Environment Variables
+
+Create a `.env.local` file in the root directory:
+
+```env
+# ElevenLabs
+NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_agent_id_here
+
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Supabase Setup
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+Create a `contact_submissions` table in your Supabase project:
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```sql
+CREATE TABLE contact_submissions (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  name TEXT NOT NULL,
+  email TEXT NOT NULL,
+  phone TEXT,
+  message TEXT NOT NULL,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
 
-## Learn More
+-- Enable Row Level Security
+ALTER TABLE contact_submissions ENABLE ROW LEVEL SECURITY;
 
-To learn more about Next.js, take a look at the following resources:
+-- Allow inserts from the client
+CREATE POLICY "Allow public inserts" ON contact_submissions
+  FOR INSERT WITH CHECK (true);
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Installation
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+# Clone the repository
+git clone https://github.com/yourusername/bala-recruitment-twin.git
+cd bala-recruitment-twin
 
-## Deploy on Vercel
+# Install dependencies
+npm install
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+# Start the development server
+npm run dev
+```
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+Open [http://localhost:3000](http://localhost:3000) to view the app.
+
+## 📁 Project Structure
+
+```
+src/
+├── app/
+│   ├── api/
+│   │   └── contact/
+│   │       └── route.ts      # Contact form API endpoint
+│   ├── contact/
+│   │   └── page.tsx          # Contact form page
+│   ├── globals.css           # Global styles & Tailwind
+│   ├── layout.tsx            # Root layout
+│   └── page.tsx              # Home page with voice agent
+├── components/
+│   └── VoiceAgent.tsx        # ElevenLabs voice widget
+└── lib/
+    └── supabase.ts           # Supabase client & types
+```
+
+## 🔧 Scripts
+
+| Command | Description |
+|---------|-------------|
+| `npm run dev` | Start development server |
+| `npm run build` | Build for production |
+| `npm run start` | Start production server |
+| `npm run lint` | Run ESLint |
+
+## 🌐 Deployment
+
+Deploy easily with [Vercel](https://vercel.com):
+
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/clone?repository-url=https://github.com/yourusername/bala-recruitment-twin)
+
+Don't forget to add your environment variables in the Vercel dashboard.
+
+## 📝 License
+
+MIT
