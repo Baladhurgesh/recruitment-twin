@@ -9,6 +9,7 @@ export default function VoiceAgent() {
   const [status, setStatus] = useState<ConversationStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [hasPermission, setHasPermission] = useState<boolean | null>(null);
+  const [showCalendly, setShowCalendly] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const animationRef = useRef<number | null>(null);
 
@@ -64,6 +65,12 @@ export default function VoiceAgent() {
       await conversation.startSession({
         conversationToken: token,
         connectionType: 'webrtc',
+        clientTools: {
+          offer_calendly: async () => {
+            setShowCalendly(true);
+            return 'Showed the 30-minute Calendly link on screen: https://calendly.com/baladhurgeshbp/30min';
+          },
+        },
       });
     } catch (error) {
       setErrorMessage(error instanceof Error ? error.message : 'Failed to start conversation');
@@ -226,6 +233,17 @@ export default function VoiceAgent() {
       <p className={`text-sm font-medium ${getStatusColor()} transition-colors duration-300`}>
         {getStatusText()}
       </p>
+
+      {showCalendly && (
+        <a
+          href="https://calendly.com/baladhurgeshbp/30min"
+          target="_blank"
+          rel="noreferrer"
+          className="px-6 py-2 rounded-full bg-blue-600 text-white text-sm font-medium hover:bg-blue-500 transition-colors"
+        >
+          Book 30 minutes
+        </a>
+      )}
 
       {/* End Conversation Button */}
       {status === 'connected' && (
