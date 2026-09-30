@@ -52,13 +52,17 @@ export default function VoiceAgent() {
     setStatus('connecting');
     
     try {
-      const agentId = process.env.NEXT_PUBLIC_ELEVENLABS_AGENT_ID;
-      if (!agentId) {
-        throw new Error('ElevenLabs Agent ID is not configured');
+      const tokenRes = await fetch('/api/conversation-token');
+      if (!tokenRes.ok) {
+        throw new Error('Could not start a private voice session.');
       }
-      
+      const { token } = await tokenRes.json();
+      if (!token) {
+        throw new Error('Voice session token was missing.');
+      }
+
       await conversation.startSession({
-        agentId,
+        conversationToken: token,
         connectionType: 'webrtc',
       });
     } catch (error) {

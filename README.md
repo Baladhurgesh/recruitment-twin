@@ -38,13 +38,16 @@ An AI-powered personal recruitment page featuring a conversational voice agent. 
 Create a `.env.local` file in the root directory:
 
 ```env
-# ElevenLabs
-NEXT_PUBLIC_ELEVENLABS_AGENT_ID=your_agent_id_here
+# ElevenLabs — server only. Do not use NEXT_PUBLIC_ for these.
+ELEVENLABS_API_KEY=your_elevenlabs_api_key
+ELEVENLABS_AGENT_ID=your_private_agent_id
 
 # Supabase
 NEXT_PUBLIC_SUPABASE_URL=https://your-project.supabase.co
 NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 ```
+
+Set the agent to **Private** in the ElevenLabs dashboard. The site mints a short-lived WebRTC token from `/api/conversation-token` so the API key and agent ID never ship to the browser. The same endpoint is used by [baladhurgesh.github.io](https://baladhurgesh.github.io/).
 
 ### Supabase Setup
 
