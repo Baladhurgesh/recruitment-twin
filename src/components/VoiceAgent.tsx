@@ -5,6 +5,33 @@ import { useState, useCallback, useEffect, useRef } from 'react';
 
 type ConversationStatus = 'idle' | 'connecting' | 'connected' | 'disconnected';
 
+type LeaveMessageArgs = { name?: unknown; contact?: unknown; message?: unknown };
+
+const str = (value: unknown) => (typeof value === 'string' ? value.trim() : '');
+
+async function leaveMessage(args?: LeaveMessageArgs) {
+  const name = str(args?.name);
+  const contact = str(args?.contact);
+  const message = str(args?.message);
+  if (!message) {
+    return "No message was provided yet. Ask the visitor what they'd like to tell Bala, then call leave_message again.";
+  }
+
+  try {
+    const res = await fetch('/api/leave-message', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ name, contact, message }),
+      signal: AbortSignal.timeout(10000),
+    });
+    if (!res.ok) throw new Error(`leave-message ${res.status}`);
+    return 'Message emailed to Bala. Confirm to the visitor that it was sent.';
+  } catch (error) {
+    console.error(error);
+    return 'The message could not be sent. Apologize and suggest emailing baladhurgeshbp@gmail.com directly.';
+  }
+}
+
 export default function VoiceAgent() {
   const [status, setStatus] = useState<ConversationStatus>('idle');
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
@@ -70,6 +97,7 @@ export default function VoiceAgent() {
             setShowCalendly(true);
             return 'Showed the 30-minute Calendly link on screen: https://calendly.com/baladhurgeshbp/30min';
           },
+          leave_message: leaveMessage,
         },
       });
     } catch (error) {

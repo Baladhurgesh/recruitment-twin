@@ -1,72 +1,9 @@
 import { NextRequest, NextResponse } from "next/server";
+import { clientIp, corsHeaders as cors, createRateLimiter, isAllowed, requestOrigin } from "@/lib/guard";
 
-const ALLOWED_ORIGINS = new Set([
-  "https://baladhurgesh.github.io",
-  "https://bala-recruitment-twin.vercel.app",
-  "http://localhost:3000",
-  "http://localhost:8765",
-  "http://127.0.0.1:3000",
-  "http://127.0.0.1:8765",
-]);
+const corsHeaders = (origin: string | null) => cors(origin, "GET, OPTIONS");
 
-const WINDOW_MS = 10 * 60 * 1000;
-const MAX_REQUESTS = 8;
-
-type Bucket = { count: number; resetAt: number };
-const buckets = new Map<string, Bucket>();
-
-function corsHeaders(origin: string | null): HeadersInit {
-  const headers: Record<string, string> = {
-    "Cache-Control": "no-store",
-    Vary: "Origin",
-  };
-  if (origin && ALLOWED_ORIGINS.has(origin)) {
-    headers["Access-Control-Allow-Origin"] = origin;
-    headers["Access-Control-Allow-Methods"] = "GET, OPTIONS";
-    headers["Access-Control-Allow-Headers"] = "Content-Type";
-    headers["Access-Control-Max-Age"] = "86400";
-  }
-  return headers;
-}
-
-function requestOrigin(request: NextRequest): string | null {
-  const origin = request.headers.get("origin");
-  if (origin) return origin;
-
-  const referer = request.headers.get("referer");
-  if (!referer) return null;
-
-  try {
-    return new URL(referer).origin;
-  } catch {
-    return null;
-  }
-}
-
-function isAllowed(origin: string | null): boolean {
-  return origin !== null && ALLOWED_ORIGINS.has(origin);
-}
-
-function clientIp(request: NextRequest): string {
-  return (
-    request.headers.get("x-forwarded-for")?.split(",")[0]?.trim() ||
-    request.headers.get("x-real-ip") ||
-    "unknown"
-  );
-}
-
-function rateLimited(ip: string): boolean {
-  const now = Date.now();
-  const existing = buckets.get(ip);
-
-  if (!existing || now > existing.resetAt) {
-    buckets.set(ip, { count: 1, resetAt: now + WINDOW_MS });
-    return false;
-  }
-
-  existing.count += 1;
-  return existing.count > MAX_REQUESTS;
-}
+const rateLimited = createRateLimiter(10 * 60 * 1000, 8);
 
 export async function OPTIONS(request: NextRequest) {
   const origin = requestOrigin(request);

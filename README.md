@@ -49,6 +49,10 @@ NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key_here
 
 Set the agent to **Private** in the ElevenLabs dashboard. The site mints a short-lived WebRTC token from `/api/conversation-token` so the API key and agent ID never ship to the browser. The same endpoint is used by [baladhurgesh.github.io](https://baladhurgesh.github.io/).
 
+### Leave-a-message tool
+
+The agent can take a message for Bala via a `leave_message` client tool (params: `message` required, `name` and `contact` optional). Both this site and baladhurgesh.github.io POST it to `/api/leave-message`, which emails it via [Resend](https://resend.com). Set `RESEND_API_KEY` and `MESSAGE_TO_EMAIL` (and optionally `MESSAGE_FROM_EMAIL`) in Vercel. The endpoint allows only listed origins and 5 messages per IP per hour.
+
 ### Supabase Setup
 
 Create a `contact_submissions` table in your Supabase project:
